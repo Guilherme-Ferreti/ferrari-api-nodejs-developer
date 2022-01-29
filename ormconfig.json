@@ -1,0 +1,24 @@
+{
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "Fe5J<~rwa^pL3!=5",
+    "database": "ferrari",
+    "synchronize": true,
+    "logging": false,
+    "entities": [
+        "typeorm/entities/**/*.ts"
+    ],
+    "migrations": [
+        "typeorm/migrations/**/*.ts"
+    ],
+    "subscribes": [
+        "typeorm/subscribers/**/*.ts"
+    ],
+    "cli": {
+        "entitiesDir": "typeorm/entities",
+        "migrationsDir": "typeorm/migrations",
+        "subscribersDir": "typeorm/subscribers"
+    }
+}
