@@ -1,10 +1,10 @@
 import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor (private authService: AuthService) {}
+  constructor (private authService: AuthService, private userService: UserService) {}
 
   async canActivate(
     context: ExecutionContext,
@@ -18,7 +18,9 @@ export class AuthGuard implements CanActivate {
         throw new BadRequestException('Token is required!');
       }
 
-      const data = await this.authService.decodeToken(token);
+      request.auth = await this.authService.decodeToken(token);
+
+      request.user = await this.userService.get(request.auth.id);
     } catch (error) {
       return false;
     }
