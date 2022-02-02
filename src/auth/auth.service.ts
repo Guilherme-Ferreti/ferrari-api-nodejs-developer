@@ -1,10 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor (private userService: UserService, private jwtService: JwtService) {}
+  constructor (
+    private userService: UserService, 
+    private jwtService: JwtService,
+    private prisma: PrismaService
+  ) {}
   
   async getToken(userId: number) {
     const { email, photo, id, person } = await this.userService.get(userId);
@@ -31,5 +36,24 @@ export class AuthService {
     }
 
     return this.jwtService.decode(token);
+  }
+
+  async recoverPassword(email: string) {
+    const { id } = await this.userService.getByEmail(email);
+
+    const token = await this.jwtService.sign({ id }, {
+      expiresIn: 30 * 60,
+    });
+
+    await this.prisma.passwordRecovery.create({
+      data: {
+        userId: id,
+        token,
+      }
+    });
+
+    // TODO: Send e-mail
+
+    return { success: true };
   }
 }
