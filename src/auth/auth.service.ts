@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -55,16 +55,54 @@ export class AuthService {
       }
     });
 
-    this.mailService.send({
-      to: email,
-      subject: 'Esqueci a senha',
-      template: 'forgot-password',
+    try {
+      this.mailService.send({
+        to: email,
+        subject: 'Esqueci a senha',
+        template: 'forgot-password',
+        data: {
+          name,
+          url: `https://lab-ferrari-jrangel.web.app/auth.html?token=${token}`,
+        }
+      });
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return { success: true };
+  }
+
+  async resetPassword({ password, token }: { password: string, token: string }) {
+    if (! password) {
+      throw new BadRequestException('Password is required!');
+    }
+
+    try {
+      await this.jwtService.verify(token);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const passwordRecovery = await this.prisma.passwordRecovery.findFirst({
+      where: {
+        token,
+        resetAt: null,
+      },
+    });
+    
+    if (! passwordRecovery) {
+      throw new BadRequestException('Token already used!');
+    }
+
+    await this.prisma.passwordRecovery.update({
+      where: {
+        id: passwordRecovery.id,
+      },
       data: {
-        name,
-        url: `https://lab-ferrari-jrangel.web.app/auth.html?token=${token}`,
+        resetAt: new Date(),
       }
     });
 
-    return { success: true };
+    return this.userService.updatePassword(passwordRecovery.userId, password);
   }
 }

@@ -2,10 +2,11 @@ import { BadRequestException, Injectable, NotFoundException, UnauthorizedExcepti
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UserService {
-  constructor (private prisma: PrismaService) {}
+  constructor (private prisma: PrismaService, private mailService: MailService) {}
 
   async get(id: number, removePassword: boolean = true) {
     id = Number(id);
@@ -219,6 +220,15 @@ export class UserService {
       },
       data: {
         password: bcrypt.hashSync(password, 10),
+      },
+    });
+
+    this.mailService.send({
+      to: user.email,
+      subject: 'Senha alterada com sucesso!',
+      template: 'password-reset-successfully',
+      data: {
+        name: user.person.name,
       },
     });
 
