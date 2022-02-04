@@ -1,10 +1,11 @@
-import { BadRequestException, Body, Controller, Post, Get, UseGuards, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post, Get, UseGuards, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { parse } from 'date-fns';
 import { UserService } from 'src/user/user.service';
 import { Auth } from './auth.decorator';
 import { User } from './../user/user.decorator';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 @Controller('auth')
@@ -87,5 +88,17 @@ export class AuthController {
   @Post('reset-password')
   async resetPassword(@Body('password') password: string, @Body('token') token: string) {
     return this.authService.resetPassword({ password, token })
+  }
+
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('photo', {
+    dest: './storage/photos',
+    limits: {
+      fileSize: 5 * 1024 * 1024,
+    }
+  }))
+  @Put('upload-photo')
+  async uploadPhoto(@User() user, @UploadedFile() photo: Express.Multer.File) {
+    return this.userService.setPhoto(user.id, photo);
   }
 }

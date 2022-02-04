@@ -3,6 +3,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { MailService } from 'src/mail/mail.service';
+import { join } from 'path';
+import { existsSync, renameSync, unlinkSync } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -130,12 +132,14 @@ export class UserService {
     birthAt,
     phone,
     document,
+    photo,
   }:{
     name?: string;
     email?: string;
     birthAt?: Date;
     phone?: string;
     document?: string;
+    photo?: string;
   }) {
     id = Number(id);
 
@@ -160,6 +164,10 @@ export class UserService {
 
     if (document) {
       personData.document = document;
+    }
+    
+    if (photo) {
+      userData.photo = photo;
     }
 
     if (email) {
@@ -233,5 +241,54 @@ export class UserService {
     });
 
     return user;
+  }
+
+  async setPhoto(id: number, photo: Express.Multer.File) {
+    if (! ['image/jpg', 'image/jpeg', 'image/png'].includes(photo.mimetype)) {
+      throw new BadRequestException('Invalid file type.');
+    }
+
+    await this.removePhoto(id);
+
+    let ext = '';
+
+    switch (photo.mimetype) {
+      case 'image/png': 
+        ext = 'png';
+        break;
+
+      default:
+        ext = 'jpg';
+    }
+
+    const photoName = `${photo.filename}.${ext}`;
+    const from = this.getPhotoStoragePath(photo.filename);
+    const to = this.getPhotoStoragePath(photoName);
+
+    renameSync(from, to);
+
+    return this.update(id, {
+      photo: photoName,
+    });
+  }
+
+  async removePhoto(userId: number) {
+    const { photo } = await this.get(userId);
+
+    if (photo) {
+      const currentPhoto = this.getPhotoStoragePath(photo);
+
+      if (existsSync(currentPhoto)) {
+        unlinkSync(currentPhoto);
+      }
+    }
+
+    return this.update(userId, {
+      photo: null,
+    });
+  }
+
+  getPhotoStoragePath(photoName: string): string {
+    return join(__dirname, '../', '../', '../', 'storage', 'photos', photoName);
   }
 }
