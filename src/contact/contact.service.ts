@@ -30,20 +30,30 @@ export class ContactService {
     let personId;
 
     if (user) {
-      personId = user.personId;
+      personId = Number(user.personId);
     } else {
-      const person = await this.prisma.person.create({
-        data: {
-          name,
+      const contact = await this.prisma.contact.findFirst({
+        where: {
+          email,
         },
       });
-      
-      personId = person.id;
+
+      if (contact) {
+        personId = Number(contact.personId);
+      } else {
+        const newPerson = await this.prisma.person.create({
+          data: {
+            name,
+          },
+        });
+        
+        personId = Number(newPerson.id);
+      }
     }
 
     return this.prisma.contact.create({
       data: {
-        personId: personId,
+        personId,
         email,
         message,
       },
