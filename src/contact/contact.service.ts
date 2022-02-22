@@ -5,6 +5,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ContactService {
   constructor (private prisma: PrismaService) {}
 
+  async list() {
+    return await this.prisma.contact.findMany();
+  }
+
   async create({ name, email, message }:{ name:string; email:string; message:string }) {
     if (! name) {
       throw new BadRequestException('Name is required.');
