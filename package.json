@@ -20,7 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:update": "prisma db pull && prisma generate",
-    "migration:create": "typeorm migration:create",
+    "migrate:create": "typeorm migration:create",
     "migrate:up": "ts-node --transpile-only ./node_modules/typeorm/cli.js migration:run",
     "postmigrate:up": "npm run prisma:update",
     "migrate:down": "ts-node --transpile-only ./node_modules/typeorm/cli.js migration:revert",
