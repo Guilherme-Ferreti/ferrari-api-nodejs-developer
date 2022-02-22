@@ -3,6 +3,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MailModule } from 'src/mail/mail.module';
+import { PasswordService } from './password.service';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { MailModule } from 'src/mail/mail.module';
     MailModule
   ],  
   controllers: [UserController],
-  providers: [UserService],
-  exports: [UserService],
+  providers: [UserService, PasswordService],
+  exports: [UserService, PasswordService],
 })
 export class UserModule {}

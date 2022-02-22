@@ -1,14 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
-import { MailService } from 'src/mail/mail.service';
 import { join } from 'path';
 import { createReadStream, existsSync, renameSync, unlinkSync } from 'fs';
 
 @Injectable()
 export class UserService {
-  constructor (private prisma: PrismaService, private mailService: MailService) {}
+  constructor (private prisma: PrismaService) {}
 
   async get(id: number, removePassword: boolean = true) {
     id = Number(id);
@@ -195,52 +194,6 @@ export class UserService {
     }
 
     return this.get(id);
-  }
-
-  async checkPassword(id: number, password: string) {
-    const user = await this.get(id, false);
-
-    const checked = await bcrypt.compare(password, user.password);
-
-    if (! checked) {
-      throw new UnauthorizedException('E-mail or password is incorrect!');
-    }
-
-    return true;
-  }
-
-  async changePassword(id: number, currentPassword: string, newPassword: string) {
-    if (! newPassword) {
-      throw new BadRequestException('New password is required!');
-    }
-
-    await this.checkPassword(id, currentPassword);
-
-    return this.updatePassword(id, newPassword);
-  }
-
-  async updatePassword(id: number, password: string) {
-    const user = await this.get(id);
-
-    await this.prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        password: bcrypt.hashSync(password, 10),
-      },
-    });
-
-    this.mailService.send({
-      to: user.email,
-      subject: 'Senha alterada com sucesso!',
-      template: 'password-reset-successfully',
-      data: {
-        name: user.person.name,
-      },
-    });
-
-    return user;
   }
 
   async setPhoto(id: number, photo: Express.Multer.File) {

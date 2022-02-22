@@ -6,11 +6,16 @@ import { User } from './../user/user.decorator';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { PasswordService } from 'src/user/password.service';
 
 
 @Controller('auth')
 export class AuthController {
-  constructor(private userService: UserService, private authService: AuthService) {}
+  constructor(
+    private userService: UserService, 
+    private authService: AuthService,
+    private passwordService: PasswordService
+  ) {}
   
   @Post()
   async verifyEmail(@Body('email') email: string) {
@@ -77,7 +82,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Put('password')
   async changePassword(@Body('currentPassword') currentPassword, @Body('newPassword') newPassword, @User('id') id) {
-    return this.userService.changePassword(id, currentPassword, newPassword);
+    return this.passwordService.changePassword(id, currentPassword, newPassword);
   }
 
   @Post('forgot-password')
