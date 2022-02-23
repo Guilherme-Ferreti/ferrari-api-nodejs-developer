@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
 import { columnCreatedAt, columnId, columnUpdatedAt } from "../columns";
 
-export class addresses1645653636047 implements MigrationInterface {
+export class Addresses1645653636047 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(new Table({
