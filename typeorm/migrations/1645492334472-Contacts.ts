@@ -35,9 +35,9 @@ export class Contacts1645492334472 implements MigrationInterface {
 					default: 'CURRENT_TIMESTAMP',
 				},
 				{
-						name: 'updatedAt',
-						type: 'datetime',
-						default: 'CURRENT_TIMESTAMP',
+					name: 'updatedAt',
+					type: 'datetime',
+					default: 'CURRENT_TIMESTAMP',
 				}
 			]
 		}));
