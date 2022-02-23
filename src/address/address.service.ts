@@ -42,6 +42,14 @@ export class AddressService {
         });
     }
 
+    async delete(id: number) {
+        await this.findOne(id);
+
+        return this.prisma.address.delete({
+            where: { id },
+        });
+    }
+
     validateAddressData(data: CreateAddressDto | UpdateAddressDto) {
         if (! data.street) {
             throw new BadRequestException('Street is required.');
