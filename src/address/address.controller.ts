@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 
@@ -9,5 +9,10 @@ export class AddressController {
     @Post()
     async create(@Body() createAddressDto: CreateAddressDto) {
         return this.addressService.create(createAddressDto);
+    }
+
+    @Get()
+    async findAll() {
+        return this.addressService.findAll();
     }
 }

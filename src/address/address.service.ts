@@ -14,6 +14,10 @@ export class AddressService {
         return this.prisma.address.create({ data });
     }
 
+    async findAll() {
+        return this.prisma.address.findMany();
+    }
+
     validateAddressData(data: CreateAddressDto) {
         if (! data.street) {
             throw new BadRequestException('Street is required.');
