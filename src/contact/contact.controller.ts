@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
 import { ContactService } from './contact.service';
 
 @Controller('contacts')
@@ -10,6 +10,11 @@ export class ContactController {
     return this.contactService.list();
   }
 
+  @Get(':id')
+  async show(@Param('id') id) {
+    return this.contactService.get(id);
+  }
+
   @Post()
   async create(
     @Body('name') name, 
@@ -19,5 +24,11 @@ export class ContactController {
     return this.contactService.create({
       name, email, message
     });
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async destroy(@Param('id') id) {
+    await this.contactService.delete(id);
   }
 }

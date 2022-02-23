@@ -5,6 +5,26 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ContactService {
   constructor (private prisma: PrismaService) {}
 
+  async get(id: number) {
+    id = Number(id);
+
+    if (isNaN(id)) {
+      throw new BadRequestException('Id is invalid.');
+    }
+
+    const contact = await this.prisma.contact.findUnique({
+      where: {
+        id,
+      }
+    });
+
+    if (! contact) {
+      throw new BadRequestException('Contact not found.');
+    }
+
+    return contact;
+  }
+
   async list() {
     return await this.prisma.contact.findMany();
   }
@@ -60,6 +80,16 @@ export class ContactService {
         personId,
         email,
         message,
+      },
+    });
+  }
+
+  async delete(id: number) {
+    await this.get(id);
+
+    return this.prisma.contact.delete({
+      where: {
+        id: Number(id),
       },
     });
   }
