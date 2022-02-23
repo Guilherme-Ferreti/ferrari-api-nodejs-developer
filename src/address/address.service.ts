@@ -18,6 +18,18 @@ export class AddressService {
         return this.prisma.address.findMany();
     }
 
+    async findOne(id: number) {
+        const address = await this.prisma.address.findUnique({
+            where: { id },
+        });
+
+        if (! address) {
+            throw new BadRequestException('Address not found.');
+        }
+
+        return address;
+    }
+
     validateAddressData(data: CreateAddressDto) {
         if (! data.street) {
             throw new BadRequestException('Street is required.');
