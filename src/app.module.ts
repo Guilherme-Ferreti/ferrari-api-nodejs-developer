@@ -5,9 +5,10 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { ContactModule } from './contact/contact.module';
+import { TimeOptionModule } from './time-option/time-option.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule, MailModule, ContactModule],
+  imports: [PrismaModule, UserModule, AuthModule, MailModule, ContactModule, TimeOptionModule],
   controllers: [AppController],
   providers: [],
 })
