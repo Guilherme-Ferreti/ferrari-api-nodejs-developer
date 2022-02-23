@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CreatePaymentSituationDto } from './dto/create-payment-situation.dto';
 import { PaymentSituationService } from './payment-situation.service';
 
@@ -14,5 +14,10 @@ export class PaymentSituationController {
     @Get()
     async findAll() {
         return this.paymentSituationService.findAll();
+    }
+
+    @Get(':id')
+    async findOne(@Param('id') id) {
+        return this.paymentSituationService.findOne(+id);
     }
 }

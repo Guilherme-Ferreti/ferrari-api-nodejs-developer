@@ -16,6 +16,18 @@ export class PaymentSituationService {
         return this.prisma.paymentSituation.findMany();
     }
 
+    async findOne(id: number) {
+        const paymentSituation = await this.prisma.paymentSituation.findUnique({
+            where: { id },
+        });
+
+        if (! paymentSituation) {
+            throw new BadRequestException('Payment Situation not found.');
+        }
+
+        return paymentSituation;
+    }
+
     validatePaymentSituationData(data: CreatePaymentSituationDto) {
         if (! data.name) {
             throw new BadRequestException('Name is required.');
