@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CreatePaymentSituationDto } from './dto/create-payment-situation.dto';
 import { PaymentSituationService } from './payment-situation.service';
 
@@ -9,5 +9,10 @@ export class PaymentSituationController {
     @Post()
     async create(@Body() createPaymentSituationDto: CreatePaymentSituationDto) {
         return this.paymentSituationService.create(createPaymentSituationDto);
+    }
+
+    @Get()
+    async findAll() {
+        return this.paymentSituationService.findAll();
     }
 }

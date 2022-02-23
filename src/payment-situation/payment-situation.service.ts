@@ -12,6 +12,10 @@ export class PaymentSituationService {
         return this.prisma.paymentSituation.create({ data });
     }
 
+    async findAll() {
+        return this.prisma.paymentSituation.findMany();
+    }
+
     validatePaymentSituationData(data: CreatePaymentSituationDto) {
         if (! data.name) {
             throw new BadRequestException('Name is required.');
