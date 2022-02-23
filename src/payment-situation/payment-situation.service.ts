@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePaymentSituationDto } from './dto/create-payment-situation.dto';
+import { UpdatePaymentSituationDto } from './dto/update-payment-situation.dto';
 
 @Injectable()
 export class PaymentSituationService {
@@ -28,7 +29,18 @@ export class PaymentSituationService {
         return paymentSituation;
     }
 
-    validatePaymentSituationData(data: CreatePaymentSituationDto) {
+    async update(id: number, data: UpdatePaymentSituationDto) {
+        await this.findOne(id);
+
+        data = this.validatePaymentSituationData(data);
+
+        return this.prisma.paymentSituation.update({
+           where: { id },
+           data, 
+        });
+    }
+
+    validatePaymentSituationData(data: CreatePaymentSituationDto | UpdatePaymentSituationDto) {
         if (! data.name) {
             throw new BadRequestException('Name is required.');
         }
