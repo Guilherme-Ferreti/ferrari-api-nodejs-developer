@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { id } from 'date-fns/locale';
 import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('addresses')
 export class AddressController {
@@ -19,5 +21,10 @@ export class AddressController {
     @Get(':id')
     async findOne(@Param('id') id) {
         return this.addressService.findOne(+id);
+    }
+
+    @Put(':id')
+    async update(@Param('id') id, @Body() updateAddressDto: UpdateAddressDto) {
+        return this.addressService.update(+id, updateAddressDto);
     }
 }

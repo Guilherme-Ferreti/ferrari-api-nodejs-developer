@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAddressDto } from './dto/create-address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Injectable()
 export class AddressService {
@@ -30,7 +31,18 @@ export class AddressService {
         return address;
     }
 
-    validateAddressData(data: CreateAddressDto) {
+    async update(id: number, data: UpdateAddressDto) {
+        data = this.validateAddressData(data);
+
+        await this.findOne(id);
+
+        return this.prisma.address.update({
+            where: { id },
+            data,
+        });
+    }
+
+    validateAddressData(data: CreateAddressDto | UpdateAddressDto) {
         if (! data.street) {
             throw new BadRequestException('Street is required.');
         }
