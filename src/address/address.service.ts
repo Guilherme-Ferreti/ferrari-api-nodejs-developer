@@ -7,21 +7,29 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 export class AddressService {
     constructor (private prisma: PrismaService) {}
 
-    async create(data: CreateAddressDto) {
-        data.personId = +data.personId;
+    async create(user, data: CreateAddressDto) {
+
+        data.personId = +user.personId;
 
         data = this.validateAddressData(data);
         
         return this.prisma.address.create({ data });
     }
 
-    async findAll() {
-        return this.prisma.address.findMany();
+    async findAll(user) {
+        return this.prisma.address.findMany({
+            where: {
+                personId: +user.personId,
+            },
+        });
     }
 
-    async findOne(id: number) {
-        const address = await this.prisma.address.findUnique({
-            where: { id },
+    async findOne(user, id: number) {
+        const address = await this.prisma.address.findFirst({
+            where: { 
+                id,
+                personId: +user.personId,
+            },
         });
 
         if (! address) {
@@ -31,10 +39,10 @@ export class AddressService {
         return address;
     }
 
-    async update(id: number, data: UpdateAddressDto) {
+    async update(user, id: number, data: UpdateAddressDto) {
         data = this.validateAddressData(data);
 
-        await this.findOne(id);
+        await this.findOne(user, id);
 
         return this.prisma.address.update({
             where: { id },
@@ -42,8 +50,8 @@ export class AddressService {
         });
     }
 
-    async delete(id: number) {
-        await this.findOne(id);
+    async delete(user, id: number) {
+        await this.findOne(user, id);
 
         return this.prisma.address.delete({
             where: { id },
