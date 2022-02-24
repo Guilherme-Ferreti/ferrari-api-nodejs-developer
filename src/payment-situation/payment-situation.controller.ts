@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { CreatePaymentSituationDto } from './dto/create-payment-situation.dto';
 import { UpdatePaymentSituationDto } from './dto/update-payment-situation.dto';
 import { PaymentSituationService } from './payment-situation.service';
@@ -25,5 +25,10 @@ export class PaymentSituationController {
     @Put(':id')
     async update(@Param('id') id, @Body() data: UpdatePaymentSituationDto) {
         return this.paymentSituationService.update(+id, data);
+    }
+
+    @Delete(':id')
+    async destroy(@Param('id') id) {
+        return this.paymentSituationService.delete(+id);
     }
 }

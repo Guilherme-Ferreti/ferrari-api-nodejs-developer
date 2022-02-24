@@ -40,6 +40,14 @@ export class PaymentSituationService {
         });
     }
 
+    async delete(id: number) {
+        await this.findOne(id);
+
+        return this.prisma.paymentSituation.delete({
+            where: { id },
+        });
+    }
+
     validatePaymentSituationData(data: CreatePaymentSituationDto | UpdatePaymentSituationDto) {
         if (! data.name) {
             throw new BadRequestException('Name is required.');
