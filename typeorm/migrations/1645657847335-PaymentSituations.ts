@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table} from "typeorm";
+import { MigrationInterface, QueryRunner, Table } from "typeorm";
 import { columnCreatedAt, columnId, columnUpdatedAt, columnVarchar } from "../columns";
 
 export class PaymentSituations1645657847335 implements MigrationInterface {
