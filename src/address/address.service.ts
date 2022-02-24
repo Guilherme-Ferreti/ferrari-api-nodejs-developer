@@ -8,12 +8,12 @@ export class AddressService {
     constructor (private prisma: PrismaService) {}
 
     async create(user, data: CreateAddressDto) {
-
-        data.personId = +user.personId;
-
-        data = this.validateAddressData(data);
-        
-        return this.prisma.address.create({ data });
+        return this.prisma.address.create({ 
+            data: {
+                personId: +user.personId,
+                ...data,
+            }
+        });
     }
 
     async findAll(user) {
@@ -40,8 +40,6 @@ export class AddressService {
     }
 
     async update(user, id: number, data: UpdateAddressDto) {
-        data = this.validateAddressData(data);
-
         await this.findOne(user, id);
 
         return this.prisma.address.update({
