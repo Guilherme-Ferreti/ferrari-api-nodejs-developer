@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { User } from 'src/user/user.decorator';
 import { AddressService } from './address.service';
@@ -23,19 +23,19 @@ export class AddressController {
 
     @UseGuards(AuthGuard)
     @Get(':id')
-    async findOne(@Param('id') id, @User() user) {
+    async findOne(@Param('id', ParseIntPipe) id, @User() user) {
         return this.addressService.findOne(user, +id);
     }
 
     @UseGuards(AuthGuard)
     @Put(':id')
-    async update(@Param('id') id, @Body() updateAddressDto: UpdateAddressDto, @User() user) {
+    async update(@Param('id', ParseIntPipe) id, @Body() updateAddressDto: UpdateAddressDto, @User() user) {
         return this.addressService.update(user, +id, updateAddressDto);
     }
 
     @UseGuards(AuthGuard)
     @Delete(':id')
-    async destroy(@Param('id') id, @User() user) {
+    async destroy(@Param('id', ParseIntPipe) id, @User() user) {
         return this.addressService.delete(user, +id);
     }
 }
