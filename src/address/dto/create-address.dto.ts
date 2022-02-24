@@ -5,10 +5,8 @@ export class CreateAddressDto {
     @IsString()
     street: string;
 
-    @IsString()
     number?: string;
 
-    @IsString()
     complement?: string;
 
     @IsNotEmpty()
