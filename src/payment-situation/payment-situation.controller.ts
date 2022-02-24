@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { CreatePaymentSituationDto } from './dto/create-payment-situation.dto';
 import { UpdatePaymentSituationDto } from './dto/update-payment-situation.dto';
 import { PaymentSituationService } from './payment-situation.service';
@@ -7,6 +8,7 @@ import { PaymentSituationService } from './payment-situation.service';
 export class PaymentSituationController {
     constructor (private paymentSituationService: PaymentSituationService) {}
 
+    @UseGuards(AuthGuard)
     @Post()
     async create(@Body() data: CreatePaymentSituationDto) {
         return this.paymentSituationService.create(data);
@@ -18,17 +20,19 @@ export class PaymentSituationController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id) {
+    async findOne(@Param('id', ParseIntPipe) id) {
         return this.paymentSituationService.findOne(+id);
     }
 
+    @UseGuards(AuthGuard)
     @Put(':id')
-    async update(@Param('id') id, @Body() data: UpdatePaymentSituationDto) {
+    async update(@Param('id', ParseIntPipe) id, @Body() data: UpdatePaymentSituationDto) {
         return this.paymentSituationService.update(+id, data);
     }
 
+    @UseGuards(AuthGuard)
     @Delete(':id')
-    async destroy(@Param('id') id) {
+    async destroy(@Param('id', ParseIntPipe) id) {
         return this.paymentSituationService.delete(+id);
     }
 }
