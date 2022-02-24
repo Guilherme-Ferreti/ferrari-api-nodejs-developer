@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
-import { columnCreatedAt, columnId, columnUpdatedAt } from "../columns";
+import { columnCreatedAt, columnId, columnUpdatedAt, columnVarchar } from "../columns";
 
 export class Addresses1645653636047 implements MigrationInterface {
 
@@ -8,48 +8,14 @@ export class Addresses1645653636047 implements MigrationInterface {
             name: 'addresses',
             columns: [
                 columnId,
-                {
-                    name: 'street',
-                    type: 'varchar',
-                    length: '191',
-                },
-                {
-                    name: 'number',
-                    type: 'varchar',
-                    length: '16',
-                    isNullable: true,
-                },
-                {
-                    name: 'complement',
-                    type: 'varchar',
-                    length: '191',
-                    isNullable: true,
-                },
-                {
-                    name: 'district',
-                    type: 'varchar',
-                    length: '191',
-                },
-                {
-                    name: 'city',
-                    type: 'varchar',
-                    length: '191',
-                },
-                {
-                    name: 'state',
-                    type: 'varchar',
-                    length: '191',
-                },
-                {
-                    name: 'country',
-                    type: 'varchar',
-                    length: '191',
-                },
-                {
-                    name: 'zipcode',
-                    type: 'varchar',
-                    length: '8',
-                },
+                columnVarchar('street', '191'),
+                columnVarchar('number', '16', true),
+                columnVarchar('complement', '191', true),
+                columnVarchar('district', '191'),
+                columnVarchar('city', '191'),
+                columnVarchar('state', '191'),
+                columnVarchar('country', '191'),
+                columnVarchar('zipcode', '191'),
                 {
                     name: 'personId',
                     type: 'int'

@@ -1,5 +1,5 @@
 import {MigrationInterface, QueryRunner, Table} from "typeorm";
-import { columnCreatedAt, columnId, columnUpdatedAt } from "../columns";
+import { columnCreatedAt, columnId, columnUpdatedAt, columnVarchar } from "../columns";
 
 export class PaymentSituations1645657847335 implements MigrationInterface {
 
@@ -8,11 +8,7 @@ export class PaymentSituations1645657847335 implements MigrationInterface {
             name: 'payment_situations',
             columns: [
                 columnId,
-                {
-                    name: 'name',
-                    type: 'varchar',
-                    length: '45',
-                },
+                columnVarchar('name', '45', true),
                 columnCreatedAt,
                 columnUpdatedAt,
             ]
