@@ -11,8 +11,21 @@ export class PaymentSituations1645657847335 implements MigrationInterface {
                 columnVarchar('name', '45', true),
                 columnCreatedAt,
                 columnUpdatedAt,
-            ]
+            ],
         }));
+
+        const payment_situations = [
+            'Aguardando Pagamento',
+            'Cancelado',
+            'Pagamento Aprovado',
+            'Pagamento Estornado',
+            'Em mediação',
+            'Enviado',
+        ];
+
+        payment_situations.map(async (item) => {
+            await queryRunner.query(`INSERT INTO payment_situations (name) VALUES ('${item}')`);
+        });
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
