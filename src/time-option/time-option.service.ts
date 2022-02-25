@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { isValidNumber } from 'utils/number-validation';
 
 @Injectable()
 export class TimeOptionService {
@@ -47,5 +48,19 @@ export class TimeOptionService {
                 time: timedate,
             },
         });
+    }
+
+    async findOne(id) {
+        id = isValidNumber(id);
+
+        const timeOption = await this.prisma.timeOption.findUnique({
+            where: { id },
+        });
+
+        if (! timeOption) {
+            throw new NotFoundException('Time Option not found!');
+        }
+
+        return timeOption
     }
 }
