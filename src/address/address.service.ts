@@ -1,11 +1,13 @@
+import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { lastValueFrom } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Injectable()
 export class AddressService {
-    constructor (private prisma: PrismaService) {}
+    constructor (private prisma: PrismaService, private httpService: HttpService) {}
 
     async create(user, data: CreateAddressDto) {
         return this.prisma.address.create({ 
@@ -82,5 +84,13 @@ export class AddressService {
         }
 
         return data as CreateAddressDto;
+    }
+
+    async searchCep(cep: string) {
+        cep = cep.replace(/[^\d]+/g, '').substring(0, 8);
+
+        const response = await lastValueFrom(this.httpService.get(`https://viacep.com.br/ws/${cep}/json/`));
+
+        return response.data;
     }
 }

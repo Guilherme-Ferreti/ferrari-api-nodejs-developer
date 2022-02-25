@@ -38,4 +38,9 @@ export class AddressController {
     async destroy(@Param('id', ParseIntPipe) id, @User() user) {
         return this.addressService.delete(user, +id);
     }
+
+    @Get('/cep/:cep')
+    async cep(@Param('cep') cep: string) {
+        return this.addressService.searchCep(cep);
+    }
 }
