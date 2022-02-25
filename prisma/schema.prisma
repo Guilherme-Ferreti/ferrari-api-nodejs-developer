@@ -14,15 +14,16 @@ model migrations {
 }
 
 model Person {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(255)
-  birthAt   DateTime? @db.Date
-  phone     String?   @db.VarChar(16)
-  document  String?   @db.VarChar(14)
-  createdAt DateTime  @default(now()) @db.DateTime(0)
-  updatedAt DateTime  @default(now()) @db.DateTime(0)
-  addresses Address[] @relation("addressesTopersons")
-  Contact   Contact[] @relation("contactsTopersons")
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  birthAt   DateTime?   @db.Date
+  phone     String?     @db.VarChar(16)
+  document  String?     @db.VarChar(14)
+  createdAt DateTime    @default(now()) @db.DateTime(0)
+  updatedAt DateTime    @default(now()) @db.DateTime(0)
+  Address   Address[]   @relation("addressesTopersons")
+  Contact   Contact[]   @relation("contactsTopersons")
+  Schedule  Schedule[]  @relation("personsToschedules")
   User      User[]
 
   @@map("persons")
@@ -36,7 +37,7 @@ model User {
   personId         Int
   createdAt        DateTime           @default(now()) @db.DateTime(0)
   updatedAt        DateTime           @default(now()) @db.DateTime(0)
-  person           Person             @relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_users_persons")
+  Person           Person             @relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_users_persons")
   PasswordRecovery PasswordRecovery[] @relation("password_recoveriesTousers")
 
   @@index([personId], map: "FK_users_persons")
@@ -50,7 +51,7 @@ model PasswordRecovery {
   resetAt   DateTime? @db.DateTime(0)
   createdAt DateTime  @default(now()) @db.DateTime(0)
   updatedAt DateTime  @default(now()) @db.DateTime(0)
-  user      User      @relation("password_recoveriesTousers", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_password_recoveries_users")
+  User      User      @relation("password_recoveriesTousers", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_password_recoveries_users")
 
   @@index([userId], map: "FK_password_recoveries_users")
   @@map("password_recoveries")
@@ -63,18 +64,19 @@ model Contact {
   message   String   @db.Text
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @default(now()) @db.DateTime(0)
-  persons   Person   @relation("contactsTopersons", fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_contacts_persons")
+  Person    Person   @relation("contactsTopersons", fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_contacts_persons")
 
   @@index([personId], map: "FK_contacts_persons")
   @@map("contacts")
 }
 
 model TimeOption {
-  id        Int      @id @default(autoincrement())
-  day       Int      @db.TinyInt
-  time      DateTime @db.Time(0)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @db.DateTime(0)
+  id        Int         @id @default(autoincrement())
+  day       Int         @db.TinyInt
+  time      DateTime    @db.Time(0)
+  createdAt DateTime    @default(now()) @db.DateTime(0)
+  updatedAt DateTime    @default(now()) @db.DateTime(0)
+  Schedule  Schedule[]  @relation("schedulesTotime_options")
 
   @@map("time_options")
 }
@@ -91,29 +93,55 @@ model Service {
 }
 
 model Address {
-  id         Int      @id @default(autoincrement())
+  id         Int         @id @default(autoincrement())
   street     String
-  number     String?  @db.VarChar(16)
+  number     String?     @db.VarChar(16)
   complement String?
   district   String
   city       String
   state      String
   country    String
-  zipcode    String   @db.VarChar(8)
+  zipcode    String      @db.VarChar(8)
   personId   Int
-  createdAt  DateTime @default(now()) @db.DateTime(0)
-  updatedAt  DateTime @default(now()) @db.DateTime(0)
-  persons    Person   @relation("addressesTopersons", fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_addresses_persons")
+  createdAt  DateTime    @default(now()) @db.DateTime(0)
+  updatedAt  DateTime    @default(now()) @db.DateTime(0)
+  Person     Person      @relation("addressesTopersons", fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_addresses_persons")
+  Schedule   Schedule[]  @relation("addressesToschedules")
 
   @@index([personId], map: "FK_addresses_persons")
   @@map("addresses")
 }
 
 model PaymentSituation {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(45)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @db.DateTime(0)
+  id        Int         @id @default(autoincrement())
+  name      String?     @db.VarChar(45)
+  createdAt DateTime    @default(now()) @db.DateTime(0)
+  updatedAt DateTime    @default(now()) @db.DateTime(0)
+  Schedule  Schedule[]  @relation("payment_situationsToschedules")
 
   @@map("payment_situations")
+}
+
+model Schedule {
+  id                 Int              @id @default(autoincrement())
+  personId           Int
+  timeOptionId       Int
+  paymentSituationId Int
+  billingAddressId   Int
+  scheduleAt         DateTime         @db.Date
+  total              Decimal          @db.Decimal(10, 2)
+  installments       Int              @default(1) @db.TinyInt
+  createdAt          DateTime         @default(now()) @db.DateTime(0)
+  updatedAt          DateTime         @default(now()) @db.DateTime(0)
+  Address            Address          @relation("addressesToschedules", fields: [billingAddressId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_addresses")
+  PaymentSituation   PaymentSituation @relation("payment_situationsToschedules", fields: [paymentSituationId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_payment_situations")
+  Person             Person           @relation("personsToschedules", fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_persons")
+  TimeOption         TimeOption       @relation("schedulesTotime_options", fields: [timeOptionId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_time_options")
+
+  @@index([billingAddressId], map: "FK_schedules_addresses")
+  @@index([paymentSituationId], map: "FK_schedules_payment_situations")
+  @@index([personId], map: "FK_schedules_persons")
+  @@index([timeOptionId], map: "FK_schedules_time_options")
+
+  @@map("schedules")
 }
