@@ -82,13 +82,13 @@ model TimeOption {
 }
 
 model Service {
-  id                Int                 @id @default(autoincrement())
-  name              String              @db.VarChar(45)
-  description       String              @db.MediumText
-  price             Decimal             @db.Decimal(10, 2)
-  createdAt         DateTime            @default(now()) @db.DateTime(0)
-  updatedAt         DateTime            @default(now()) @db.DateTime(0)
-  ScheduleService   ScheduleService[]   @relation("schedule_servicesToservices")
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(45)
+  description     String            @db.MediumText
+  price           Decimal           @db.Decimal(10, 2)
+  createdAt       DateTime          @default(now()) @db.DateTime(0)
+  updatedAt       DateTime          @default(now()) @db.DateTime(0)
+  ScheduleService ScheduleService[] @relation("schedule_servicesToservices")
 
   @@map("services")
 }
@@ -124,21 +124,21 @@ model PaymentSituation {
 }
 
 model Schedule {
-  id                 Int                 @id @default(autoincrement())
+  id                 Int               @id @default(autoincrement())
   personId           Int
   timeOptionId       Int
   paymentSituationId Int
   billingAddressId   Int
-  scheduleAt         DateTime            @db.Date
-  total              Decimal             @db.Decimal(10, 2)
-  installments       Int                 @default(1) @db.TinyInt
-  createdAt          DateTime            @default(now()) @db.DateTime(0)
-  updatedAt          DateTime            @default(now()) @db.DateTime(0)
-  Address            Address             @relation("addressesToschedules", fields: [billingAddressId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_addresses")
-  PaymentSituation   PaymentSituation    @relation("payment_situationsToschedules", fields: [paymentSituationId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_payment_situations")
-  Person             Person              @relation("personsToschedules", fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_persons")
-  TimeOption         TimeOption          @relation("schedulesTotime_options", fields: [timeOptionId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_time_options")
-  ScheduleService    ScheduleService[]   @relation("schedule_servicesToschedules")
+  scheduleAt         DateTime          @db.Date
+  total              Decimal           @db.Decimal(10, 2)
+  installments       Int               @default(1) @db.TinyInt
+  createdAt          DateTime          @default(now()) @db.DateTime(0)
+  updatedAt          DateTime          @default(now()) @db.DateTime(0)
+  Address            Address           @relation("addressesToschedules", fields: [billingAddressId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_addresses")
+  PaymentSituation   PaymentSituation  @relation("payment_situationsToschedules", fields: [paymentSituationId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_payment_situations")
+  Person             Person            @relation("personsToschedules", fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_persons")
+  TimeOption         TimeOption        @relation("schedulesTotime_options", fields: [timeOptionId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_schedules_time_options")
+  ScheduleService    ScheduleService[] @relation("schedule_servicesToschedules")
 
   @@index([billingAddressId], map: "FK_schedules_addresses")
   @@index([paymentSituationId], map: "FK_schedules_payment_situations")
