@@ -8,7 +8,7 @@ export class PaymentSituations1645657847335 implements MigrationInterface {
             name: 'payment_situations',
             columns: [
                 columnId,
-                columnVarchar('name', '45', true),
+                columnVarchar('name', '45'),
                 columnCreatedAt,
                 columnUpdatedAt,
             ],
