@@ -16,8 +16,8 @@ export class AuthService {
   ) {}
   
   async getToken(userId: number) {
-    const { email, photo, id, person } = await this.userService.get(userId);
-    const { name } = person;
+    const { email, photo, id, Person } = await this.userService.get(userId);
+    const { name } = Person;
   
     return this.jwtService.sign({ name, email, photo, id });
   }
@@ -43,8 +43,8 @@ export class AuthService {
   }
 
   async recoverPassword(email: string) {
-    const { id, person } = await this.userService.getByEmail(email);
-    const { name } = person;
+    const { id, Person } = await this.userService.getByEmail(email);
+    const { name } = Person;
 
     const token = await this.jwtService.sign({ id }, {
       expiresIn: 30 * 60,

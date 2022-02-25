@@ -47,7 +47,7 @@ export class PasswordService {
       subject: 'Senha alterada com sucesso!',
       template: 'password-reset-successfully',
       data: {
-        name: user.person.name,
+        name: user.Person.name,
       },
     });
 

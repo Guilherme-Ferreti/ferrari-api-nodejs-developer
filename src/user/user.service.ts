@@ -21,7 +21,7 @@ export class UserService {
         id,
       },
       include: {
-        person: true,
+        Person: true,
       },
     });
 
@@ -46,7 +46,7 @@ export class UserService {
         email,
       },
       include: {
-        person: true,
+        Person: true,
       },
     });
 
@@ -104,7 +104,7 @@ export class UserService {
 
     const createdUser = await this.prisma.user.create({
       data: {
-        person: {
+        Person: {
           create: {
             name,
             birthAt,
@@ -116,7 +116,7 @@ export class UserService {
         password: bcrypt.hashSync(password, 10),
       },
       include: {
-        person: true,
+        Person: true,
       },
     });
 
