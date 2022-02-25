@@ -9,9 +9,10 @@ import { TimeOptionModule } from './time-option/time-option.module';
 import { ServiceModule } from './service/service.module';
 import { AddressModule } from './address/address.module';
 import { PaymentSituationModule } from './payment-situation/payment-situation.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule, MailModule, ContactModule, TimeOptionModule, ServiceModule, AddressModule, PaymentSituationModule],
+  imports: [PrismaModule, UserModule, AuthModule, MailModule, ContactModule, TimeOptionModule, ServiceModule, AddressModule, PaymentSituationModule, ScheduleModule],
   controllers: [AppController],
   providers: [],
 })
