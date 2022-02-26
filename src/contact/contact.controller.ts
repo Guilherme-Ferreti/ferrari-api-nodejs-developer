@@ -1,34 +1,37 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { User } from 'src/user/user.decorator';
 import { ContactService } from './contact.service';
+import { CreateContactDto } from './dto/create-contact.dto';
 
 @Controller('contacts')
 export class ContactController {
-  constructor(private contactService: ContactService) {}
+    constructor(private contactService: ContactService) {}
 
-  @Get()
-  async list() {
-    return this.contactService.list();
-  }
+    @Get()
+    async findAll() {
+        return this.contactService.findAll();
+    }
 
-  @Get(':id')
-  async show(@Param('id') id) {
-    return this.contactService.get(id);
-  }
+    @UseGuards(AuthGuard)
+    @Get('/my-contacts')
+    async findAllWherePerson(@User() user) {
+        return this.contactService.findAllWherePerson(user.personId);
+    }
 
-  @Post()
-  async create(
-    @Body('name') name, 
-    @Body('email') email, 
-    @Body('message') message
-  ) {
-    return this.contactService.create({
-      name, email, message
-    });
-  }
+    @Get(':id')
+    async findOne(@Param('id', ParseIntPipe) id) {
+        return this.contactService.findOne(id);
+    }
 
-  @Delete(':id')
-  @HttpCode(204)
-  async destroy(@Param('id') id) {
-    await this.contactService.delete(id);
-  }
+    @Post()
+    async create(@Body() data: CreateContactDto) {
+        return this.contactService.create(data);
+    }
+
+    @Delete(':id')
+    @HttpCode(204)
+    async destroy(@Param('id', ParseIntPipe) id) {
+        await this.contactService.delete(id);
+    }
 }
