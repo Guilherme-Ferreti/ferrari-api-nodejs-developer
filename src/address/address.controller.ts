@@ -10,15 +10,9 @@ export class AddressController {
     constructor (private addressService: AddressService) {}
 
     @UseGuards(AuthGuard)
-    @Post()
-    async create(@Body() createAddressDto: CreateAddressDto, @User() user) {
-        return this.addressService.create(user, createAddressDto);
-    }
-
-    @UseGuards(AuthGuard)
     @Get()
     async findAll(@User() user) {
-        return this.addressService.findAll(user);
+        return this.addressService.findAllWherePerson(+user.personId);
     }
 
     @UseGuards(AuthGuard)
@@ -28,15 +22,21 @@ export class AddressController {
     }
 
     @UseGuards(AuthGuard)
+    @Post()
+    async create(@Body() createAddressDto: CreateAddressDto, @User() user) {
+        return this.addressService.create(user, createAddressDto);
+    }
+
+    @UseGuards(AuthGuard)
     @Put(':id')
-    async update(@Param('id', ParseIntPipe) id, @Body() updateAddressDto: UpdateAddressDto, @User() user) {
-        return this.addressService.update(user, +id, updateAddressDto);
+    async update(@Param('id', ParseIntPipe) id, @Body() data: UpdateAddressDto, @User() user) {
+        return this.addressService.update(+id, data, +user.personId);
     }
 
     @UseGuards(AuthGuard)
     @Delete(':id')
     async destroy(@Param('id', ParseIntPipe) id, @User() user) {
-        return this.addressService.delete(user, +id);
+        return this.addressService.delete(id, +user.personId);
     }
 
     @Get('/cep/:cep')

@@ -10,19 +10,10 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 export class AddressService {
     constructor (private prisma: PrismaService, private httpService: HttpService) {}
 
-    async create(user, data: CreateAddressDto) {
-        return this.prisma.address.create({ 
-            data: {
-                personId: +user.personId,
-                ...data,
-            }
-        });
-    }
-
-    async findAll(user) {
+    async findAllWherePerson(personId: number) {
         return this.prisma.address.findMany({
             where: {
-                personId: +user.personId,
+                personId: isValidNumber(personId),
             },
         });
     }
@@ -54,8 +45,17 @@ export class AddressService {
         return address;
     }
 
-    async update(user, id: number, data: UpdateAddressDto) {
-        await this.findOneWherePerson(id, user.personId);
+    async create(user, data: CreateAddressDto) {
+        return this.prisma.address.create({ 
+            data: {
+                personId: +user.personId,
+                ...data,
+            }
+        });
+    }
+
+    async update(id: number, data: UpdateAddressDto, personId: number) {
+        await this.findOneWherePerson(id, personId);
 
         return this.prisma.address.update({
             where: { id },
@@ -63,40 +63,12 @@ export class AddressService {
         });
     }
 
-    async delete(user, id: number) {
-        await this.findOneWherePerson(id, +user.personId);
+    async delete(id: number, personId: number) {
+        await this.findOneWherePerson(id, personId);
 
         return this.prisma.address.delete({
             where: { id },
         });
-    }
-
-    validateAddressData(data: CreateAddressDto | UpdateAddressDto) {
-        if (! data.street) {
-            throw new BadRequestException('Street is required.');
-        }
-
-        if (! data.district) {
-            throw new BadRequestException('District is required.');
-        }
-
-        if (! data.city) {
-            throw new BadRequestException('City is required.');
-        }
-
-        if (! data.state) {
-            throw new BadRequestException('State is required.');
-        }
-
-        if (! data.country) {
-            throw new BadRequestException('Country is required.');
-        }
-
-        if (! data.zipcode) {
-            throw new BadRequestException('Zipcode is required.');
-        }
-
-        return data as CreateAddressDto;
     }
 
     async searchCep(cep: string) {
