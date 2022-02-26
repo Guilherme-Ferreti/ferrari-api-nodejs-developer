@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { isValidNumber } from 'utils/number-validation';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
@@ -26,11 +27,23 @@ export class AddressService {
         });
     }
 
-    async findOne(user, id: number) {
+    async findOne(id: number) {
+        const address = await this.prisma.address.findUnique({
+            where: { id },
+        });
+
+        if (! address) {
+            throw new BadRequestException('Address not found.');
+        }
+
+        return address;
+    }
+
+    async findOneWherePerson(id: number, personId: number) {
         const address = await this.prisma.address.findFirst({
             where: { 
-                id,
-                personId: +user.personId,
+                id: isValidNumber(id),
+                personId: +personId,
             },
         });
 
@@ -42,7 +55,7 @@ export class AddressService {
     }
 
     async update(user, id: number, data: UpdateAddressDto) {
-        await this.findOne(user, id);
+        await this.findOneWherePerson(id, user.personId);
 
         return this.prisma.address.update({
             where: { id },
@@ -51,7 +64,7 @@ export class AddressService {
     }
 
     async delete(user, id: number) {
-        await this.findOne(user, id);
+        await this.findOneWherePerson(id, +user.personId);
 
         return this.prisma.address.delete({
             where: { id },

@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { AddressService } from 'src/address/address.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TimeOptionService } from 'src/time-option/time-option.service';
 import { isValidNumber } from 'utils/number-validation';
@@ -9,6 +10,7 @@ export class ScheduleService {
     constructor (
         private prisma: PrismaService,
         private timeOptionService: TimeOptionService,
+        private addressService: AddressService
     ) {}
 
     async findAll() {
@@ -35,11 +37,12 @@ export class ScheduleService {
         return schedule;
     }
 
-    async create(data: CreateScheduleDto, user) {
-        data.scheduleAt = new Date(data.scheduleAt);
-
+    async create(data: CreateScheduleDto, personId: number) {
         await this.timeOptionService.findOne(data.timeOptionId);
-
+        await this.addressService.findOneWherePerson(data.billingAddressId, personId);
+        
+        data.scheduleAt = new Date(data.scheduleAt);
+        
         const existingSchedule = await this.prisma.schedule.findFirst({
             where: { 
                 scheduleAt: data.scheduleAt
@@ -58,7 +61,7 @@ export class ScheduleService {
                 scheduleAt: data.scheduleAt,
                 total: isValidNumber(data.total),
                 installments: isValidNumber(data.installments),
-                personId: +user.personId,
+                personId: isValidNumber(personId),
             },
         });
 

@@ -24,7 +24,7 @@ export class ScheduleController {
     @UseGuards(AuthGuard)
     @Post()
     async create(@Body() data: CreateScheduleDto, @User() user) {
-        return this.scheduleService.create(data, user);
+        return this.scheduleService.create(data, +user.personId);
     }
 
     @UseGuards(AuthGuard)

@@ -24,7 +24,7 @@ export class AddressController {
     @UseGuards(AuthGuard)
     @Get(':id')
     async findOne(@Param('id', ParseIntPipe) id, @User() user) {
-        return this.addressService.findOne(user, +id);
+        return this.addressService.findOneWherePerson(+id, +user.personId);
     }
 
     @UseGuards(AuthGuard)
