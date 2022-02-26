@@ -8,8 +8,6 @@ export class PaymentSituationService {
     constructor (private prisma: PrismaService) {}
 
     async create(data: CreatePaymentSituationDto) {
-        data = this.validatePaymentSituationData(data);
-
         return this.prisma.paymentSituation.create({ data });
     }
 
@@ -32,8 +30,6 @@ export class PaymentSituationService {
     async update(id: number, data: UpdatePaymentSituationDto) {
         await this.findOne(id);
 
-        data = this.validatePaymentSituationData(data);
-
         return this.prisma.paymentSituation.update({
            where: { id },
            data, 
@@ -46,13 +42,5 @@ export class PaymentSituationService {
         return this.prisma.paymentSituation.delete({
             where: { id },
         });
-    }
-
-    validatePaymentSituationData(data: CreatePaymentSituationDto | UpdatePaymentSituationDto) {
-        if (! data.name) {
-            throw new BadRequestException('Name is required.');
-        }
-
-        return data as CreatePaymentSituationDto;
     }
 }
