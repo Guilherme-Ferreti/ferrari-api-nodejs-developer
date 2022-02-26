@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { isValidNumber } from 'utils/number-validation';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 
@@ -9,7 +10,7 @@ export class ServiceService {
 
     async create(data: CreateServiceDto) {
         return this.prisma.service.create({ 
-            data: this.validateServiceData(data)
+            data,
         });
     }
 
@@ -18,20 +19,14 @@ export class ServiceService {
     }
 
     async findOne(id: number) {
-        id = Number(id);
-
-        if (isNaN(id)) {
-            throw new BadRequestException('Id is invalid.');
-        }
-
         const service = await this.prisma.service.findUnique({
-            where: {
-            id,
+            where: { 
+                id: isValidNumber(id)
             },
         });
 
         if (! service) {
-            throw new BadRequestException('Service not found.');
+            throw new NotFoundException('Service not found.');
         }
 
         return service;
@@ -42,7 +37,7 @@ export class ServiceService {
 
         return this.prisma.service.update({
             where: { id },
-            data: this.validateServiceData(data)
+            data,
         });
     }
 
@@ -52,21 +47,5 @@ export class ServiceService {
         return this.prisma.service.delete({
             where: { id },
         });
-    }
-
-    validateServiceData(data: CreateServiceDto | UpdateServiceDto) {
-        if (! data.name) {
-            throw new BadRequestException('Name is required.');
-        }
-
-        if (! data.description) {
-            throw new BadRequestException('Description is required.');
-        }
-
-        if (! data.price) {
-            throw new BadRequestException('Price is required.');
-        }
-
-        return data as CreateServiceDto;
     }
 }
