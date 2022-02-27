@@ -6,12 +6,12 @@ export class TimeOptionController {
     constructor (private timeOptionService: TimeOptionService) {}
 
     @Get()
-    async getTimeOptions() {
-        return this.timeOptionService.listTimeOptions();
+    async findAll() {
+        return this.timeOptionService.findAll();
     }
 
     @Post()
-    async createTimeOption(@Body('day') day, @Body('time') time) {
-        return this.timeOptionService.createTimeOption({ day, time });
+    async create(@Body('day') day, @Body('time') time) {
+        return this.timeOptionService.create({ day, time });
     }
 }

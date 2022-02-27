@@ -6,11 +6,25 @@ import { isValidNumber } from 'utils/number-validation';
 export class TimeOptionService {
     constructor (private prisma: PrismaService) {}
 
-    async listTimeOptions() {
+    async findAll() {
         return this.prisma.timeOption.findMany();
     }
+    
+    async findOne(id) {
+        const timeOption = await this.prisma.timeOption.findUnique({
+            where: { 
+                id: isValidNumber(id),
+            },
+        });
 
-    async createTimeOption({ day, time }: { day: number; time: string }) {
+        if (! timeOption) {
+            throw new NotFoundException('Time Option not found!');
+        }
+
+        return timeOption;
+    }
+
+    async create({ day, time }: { day: number; time: string }) {
         day = Number(day);
 
         if (isNaN(day) || day < 0 || day > 6) {
@@ -48,19 +62,5 @@ export class TimeOptionService {
                 time: timedate,
             },
         });
-    }
-
-    async findOne(id) {
-        id = isValidNumber(id);
-
-        const timeOption = await this.prisma.timeOption.findUnique({
-            where: { id },
-        });
-
-        if (! timeOption) {
-            throw new NotFoundException('Time Option not found!');
-        }
-
-        return timeOption
     }
 }
