@@ -4,20 +4,20 @@ import { isValidNumber } from 'utils/number-validation';
 
 @Injectable()
 export class TimeOptionService {
-    constructor (private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
     async findAll() {
         return this.prisma.timeOption.findMany();
     }
-    
+
     async findOne(id) {
         const timeOption = await this.prisma.timeOption.findUnique({
-            where: { 
+            where: {
                 id: isValidNumber(id),
             },
         });
 
-        if (! timeOption) {
+        if (!timeOption) {
             throw new NotFoundException('Time Option not found!');
         }
 
@@ -31,7 +31,7 @@ export class TimeOptionService {
             throw new BadRequestException('Day is incorrect.');
         }
 
-        if (! time) {
+        if (!time) {
             throw new BadRequestException('Time is required.');
         }
 

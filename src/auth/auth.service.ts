@@ -7,104 +7,107 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor (
-    private userService: UserService, 
-    private jwtService: JwtService,
-    private prisma: PrismaService,
-    private mailService: MailService,
-    private passwordService: PasswordService
-  ) {}
-  
-  async getToken(userId: number) {
-    const { email, photo, id, Person } = await this.userService.get(userId);
-    const { name } = Person;
-  
-    return this.jwtService.sign({ name, email, photo, id });
-  }
+    constructor(
+        private userService: UserService,
+        private jwtService: JwtService,
+        private prisma: PrismaService,
+        private mailService: MailService,
+        private passwordService: PasswordService,
+    ) {}
 
-  async login({ email, password }: { email: string, password: string }) {
-    const user = await this.userService.getByEmail(email);
+    async getToken(userId: number) {
+        const { email, photo, id, Person } = await this.userService.get(userId);
+        const { name } = Person;
 
-    await this.passwordService.checkPassword(user.id, password);
-
-    const token = await this.getToken(user.id);
-
-    return { token };
-  }
-
-  async decodeToken(token: string) {
-    try {
-      await this.jwtService.verify(token);
-    } catch (error) {
-      throw new UnauthorizedException('Access denied!');
+        return this.jwtService.sign({ name, email, photo, id });
     }
 
-    return this.jwtService.decode(token);
-  }
+    async login({ email, password }: { email: string; password: string }) {
+        const user = await this.userService.getByEmail(email);
 
-  async recoverPassword(email: string) {
-    const { id, Person } = await this.userService.getByEmail(email);
-    const { name } = Person;
+        await this.passwordService.checkPassword(user.id, password);
 
-    const token = await this.jwtService.sign({ id }, {
-      expiresIn: 30 * 60,
-    });
+        const token = await this.getToken(user.id);
 
-    await this.prisma.passwordRecovery.create({
-      data: {
-        userId: id,
-        token,
-      }
-    });
+        return { token };
+    }
 
-    try {
-      this.mailService.send({
-        to: email,
-        subject: 'Esqueci a senha',
-        template: 'forgot-password',
-        data: {
-          name,
-          url: `https://lab-ferrari-jrangel.web.app/auth.html?token=${token}`,
+    async decodeToken(token: string) {
+        try {
+            await this.jwtService.verify(token);
+        } catch (error) {
+            throw new UnauthorizedException('Access denied!');
         }
-      });
-    } catch (error) {
-      throw new BadRequestException(error.message);
+
+        return this.jwtService.decode(token);
     }
 
-    return { success: true };
-  }
+    async recoverPassword(email: string) {
+        const { id, Person } = await this.userService.getByEmail(email);
+        const { name } = Person;
 
-  async resetPassword({ password, token }: { password: string, token: string }) {
-    if (! password) {
-      throw new BadRequestException('Password is required!');
+        const token = await this.jwtService.sign(
+            { id },
+            {
+                expiresIn: 30 * 60,
+            },
+        );
+
+        await this.prisma.passwordRecovery.create({
+            data: {
+                userId: id,
+                token,
+            },
+        });
+
+        try {
+            this.mailService.send({
+                to: email,
+                subject: 'Esqueci a senha',
+                template: 'forgot-password',
+                data: {
+                    name,
+                    url: `https://lab-ferrari-jrangel.web.app/auth.html?token=${token}`,
+                },
+            });
+        } catch (error) {
+            throw new BadRequestException(error.message);
+        }
+
+        return { success: true };
     }
 
-    try {
-      await this.jwtService.verify(token);
-    } catch (error) {
-      throw new BadRequestException(error.message);
+    async resetPassword({ password, token }: { password: string; token: string }) {
+        if (!password) {
+            throw new BadRequestException('Password is required!');
+        }
+
+        try {
+            await this.jwtService.verify(token);
+        } catch (error) {
+            throw new BadRequestException(error.message);
+        }
+
+        const passwordRecovery = await this.prisma.passwordRecovery.findFirst({
+            where: {
+                token,
+                resetAt: null,
+            },
+        });
+
+        if (!passwordRecovery) {
+            throw new BadRequestException('Token already used!');
+        }
+
+        await this.prisma.passwordRecovery.update({
+            where: {
+                id: passwordRecovery.id,
+            },
+            data: {
+                resetAt: new Date(),
+            },
+        });
+
+        return this.passwordService.updatePassword(passwordRecovery.userId, password);
     }
-
-    const passwordRecovery = await this.prisma.passwordRecovery.findFirst({
-      where: {
-        token,
-        resetAt: null,
-      },
-    });
-    
-    if (! passwordRecovery) {
-      throw new BadRequestException('Token already used!');
-    }
-
-    await this.prisma.passwordRecovery.update({
-      where: {
-        id: passwordRecovery.id,
-      },
-      data: {
-        resetAt: new Date(),
-      }
-    });
-
-    return this.passwordService.updatePassword(passwordRecovery.userId, password);
-  }
 }

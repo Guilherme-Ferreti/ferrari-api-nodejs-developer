@@ -3,7 +3,7 @@ import { TimeOptionService } from './time-option.service';
 
 @Controller('time-options')
 export class TimeOptionController {
-    constructor (private timeOptionService: TimeOptionService) {}
+    constructor(private timeOptionService: TimeOptionService) {}
 
     @Get()
     async findAll() {

@@ -4,9 +4,9 @@ import { TimeOptionController } from './time-option.controller';
 import { TimeOptionService } from './time-option.service';
 
 @Module({
-  imports: [PrismaModule],
-  controllers: [TimeOptionController],
-  providers: [TimeOptionService],
-  exports: [TimeOptionService],
+    imports: [PrismaModule],
+    controllers: [TimeOptionController],
+    providers: [TimeOptionService],
+    exports: [TimeOptionService],
 })
 export class TimeOptionModule {}

@@ -6,9 +6,9 @@ import { PaymentSituationController } from './payment-situation.controller';
 import { PaymentSituationService } from './payment-situation.service';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UserModule],
-  controllers: [PaymentSituationController],
-  providers: [PaymentSituationService],
-  exports: [PaymentSituationService]
+    imports: [PrismaModule, AuthModule, UserModule],
+    controllers: [PaymentSituationController],
+    providers: [PaymentSituationService],
+    exports: [PaymentSituationService],
 })
 export class PaymentSituationModule {}

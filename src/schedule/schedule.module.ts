@@ -8,9 +8,9 @@ import { ScheduleController } from './schedule.controller';
 import { ScheduleService } from './schedule.service';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UserModule, TimeOptionModule, AddressModule],
-  controllers: [ScheduleController],
-  providers: [ScheduleService],
-  exports: [ScheduleService]
+    imports: [PrismaModule, AuthModule, UserModule, TimeOptionModule, AddressModule],
+    controllers: [ScheduleController],
+    providers: [ScheduleService],
+    exports: [ScheduleService],
 })
 export class ScheduleModule {}

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { isValidNumber } from 'utils/number-validation';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -6,10 +6,10 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 
 @Injectable()
 export class ServiceService {
-    constructor (private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
     async create(data: CreateServiceDto) {
-        return this.prisma.service.create({ 
+        return this.prisma.service.create({
             data,
         });
     }
@@ -20,12 +20,12 @@ export class ServiceService {
 
     async findOne(id: number) {
         const service = await this.prisma.service.findUnique({
-            where: { 
-                id: isValidNumber(id)
+            where: {
+                id: isValidNumber(id),
             },
         });
 
-        if (! service) {
+        if (!service) {
             throw new NotFoundException('Service not found.');
         }
 

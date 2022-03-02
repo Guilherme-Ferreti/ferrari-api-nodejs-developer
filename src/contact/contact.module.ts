@@ -6,8 +6,8 @@ import { ContactController } from './contact.controller';
 import { ContactService } from './contact.service';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UserModule],
-  controllers: [ContactController],
-  providers: [ContactService],
+    imports: [PrismaModule, AuthModule, UserModule],
+    controllers: [ContactController],
+    providers: [ContactService],
 })
 export class ContactModule {}

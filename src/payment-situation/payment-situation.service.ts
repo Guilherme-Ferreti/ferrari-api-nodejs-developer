@@ -5,7 +5,7 @@ import { UpdatePaymentSituationDto } from './dto/update-payment-situation.dto';
 
 @Injectable()
 export class PaymentSituationService {
-    constructor (private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
     async create(data: CreatePaymentSituationDto) {
         return this.prisma.paymentSituation.create({ data });
@@ -20,7 +20,7 @@ export class PaymentSituationService {
             where: { id },
         });
 
-        if (! paymentSituation) {
+        if (!paymentSituation) {
             throw new BadRequestException('Payment Situation not found.');
         }
 
@@ -31,8 +31,8 @@ export class PaymentSituationService {
         await this.findOne(id);
 
         return this.prisma.paymentSituation.update({
-           where: { id },
-           data, 
+            where: { id },
+            data,
         });
     }
 

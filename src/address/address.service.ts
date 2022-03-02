@@ -8,7 +8,7 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Injectable()
 export class AddressService {
-    constructor (private prisma: PrismaService, private httpService: HttpService) {}
+    constructor(private prisma: PrismaService, private httpService: HttpService) {}
 
     async findAllWherePerson(personId: number) {
         return this.prisma.address.findMany({
@@ -23,7 +23,7 @@ export class AddressService {
             where: { id },
         });
 
-        if (! address) {
+        if (!address) {
             throw new BadRequestException('Address not found.');
         }
 
@@ -32,13 +32,13 @@ export class AddressService {
 
     async findOneWherePerson(id: number, personId: number) {
         const address = await this.prisma.address.findFirst({
-            where: { 
+            where: {
                 id: isValidNumber(id),
                 personId: +personId,
             },
         });
 
-        if (! address) {
+        if (!address) {
             throw new BadRequestException('Address not found.');
         }
 
@@ -46,11 +46,11 @@ export class AddressService {
     }
 
     async create(user, data: CreateAddressDto) {
-        return this.prisma.address.create({ 
+        return this.prisma.address.create({
             data: {
                 personId: +user.personId,
                 ...data,
-            }
+            },
         });
     }
 

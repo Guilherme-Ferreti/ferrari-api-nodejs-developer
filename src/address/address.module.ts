@@ -7,9 +7,9 @@ import { AddressController } from './address.controller';
 import { AddressService } from './address.service';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UserModule, HttpModule],
-  controllers: [AddressController],
-  providers: [AddressService],
-  exports: [AddressService]
+    imports: [PrismaModule, AuthModule, UserModule, HttpModule],
+    controllers: [AddressController],
+    providers: [AddressService],
+    exports: [AddressService],
 })
 export class AddressModule {}

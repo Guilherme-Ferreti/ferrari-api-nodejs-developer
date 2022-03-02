@@ -12,8 +12,19 @@ import { PaymentSituationModule } from './payment-situation/payment-situation.mo
 import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule, MailModule, ContactModule, TimeOptionModule, ServiceModule, AddressModule, PaymentSituationModule, ScheduleModule],
-  controllers: [AppController],
-  providers: [],
+    imports: [
+        PrismaModule,
+        UserModule,
+        AuthModule,
+        MailModule,
+        ContactModule,
+        TimeOptionModule,
+        ServiceModule,
+        AddressModule,
+        PaymentSituationModule,
+        ScheduleModule,
+    ],
+    controllers: [AppController],
+    providers: [],
 })
 export class AppModule {}

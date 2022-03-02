@@ -7,7 +7,7 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('addresses')
 export class AddressController {
-    constructor (private addressService: AddressService) {}
+    constructor(private addressService: AddressService) {}
 
     @UseGuards(AuthGuard)
     @Get()

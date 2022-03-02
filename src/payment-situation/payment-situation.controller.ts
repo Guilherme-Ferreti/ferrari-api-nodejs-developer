@@ -6,7 +6,7 @@ import { PaymentSituationService } from './payment-situation.service';
 
 @Controller('payment-situations')
 export class PaymentSituationController {
-    constructor (private paymentSituationService: PaymentSituationService) {}
+    constructor(private paymentSituationService: PaymentSituationService) {}
 
     @UseGuards(AuthGuard)
     @Post()

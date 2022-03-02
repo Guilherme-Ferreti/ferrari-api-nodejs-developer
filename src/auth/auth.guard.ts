@@ -4,27 +4,25 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor (private authService: AuthService, private userService: UserService) {}
+    constructor(private authService: AuthService, private userService: UserService) {}
 
-  async canActivate(
-    context: ExecutionContext,
-  ): Promise<boolean> {
-    try {
-      const request = context.switchToHttp().getRequest();
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        try {
+            const request = context.switchToHttp().getRequest();
 
-      const token = request.headers['authorization'].split(' ')[1];
+            const token = request.headers['authorization'].split(' ')[1];
 
-      if (! token) {
-        throw new BadRequestException('Token is required!');
-      }
+            if (!token) {
+                throw new BadRequestException('Token is required!');
+            }
 
-      request.auth = await this.authService.decodeToken(token);
+            request.auth = await this.authService.decodeToken(token);
 
-      request.user = await this.userService.get(request.auth.id);
-    } catch (error) {
-      return false;
+            request.user = await this.userService.get(request.auth.id);
+        } catch (error) {
+            return false;
+        }
+
+        return true;
     }
-
-    return true;
-  }
 }

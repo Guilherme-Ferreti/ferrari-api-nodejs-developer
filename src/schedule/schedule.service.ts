@@ -7,11 +7,7 @@ import { CreateScheduleDto } from './dto/create-schedule.dto';
 
 @Injectable()
 export class ScheduleService {
-    constructor (
-        private prisma: PrismaService,
-        private timeOptionService: TimeOptionService,
-        private addressService: AddressService
-    ) {}
+    constructor(private prisma: PrismaService, private timeOptionService: TimeOptionService, private addressService: AddressService) {}
 
     async findAll() {
         return this.prisma.schedule.findMany();
@@ -19,9 +15,9 @@ export class ScheduleService {
 
     async findAllWherePerson(personId: number) {
         return this.prisma.schedule.findMany({
-            where: { 
+            where: {
                 personId: isValidNumber(personId),
-            }
+            },
         });
     }
 
@@ -30,22 +26,22 @@ export class ScheduleService {
             where: { id },
         });
 
-        if (! schedule) {
+        if (!schedule) {
             throw new NotFoundException('Schedule not found.');
         }
-    
+
         return schedule;
     }
 
     async create(data: CreateScheduleDto, personId: number) {
         await this.timeOptionService.findOne(data.timeOptionId);
         await this.addressService.findOneWherePerson(data.billingAddressId, personId);
-        
+
         data.scheduleAt = new Date(data.scheduleAt);
-        
+
         const existingSchedule = await this.prisma.schedule.findFirst({
-            where: { 
-                scheduleAt: data.scheduleAt
+            where: {
+                scheduleAt: data.scheduleAt,
             },
         });
 
@@ -66,7 +62,7 @@ export class ScheduleService {
         });
 
         if (schedule) {
-            data.services.split(',').forEach(async serviceId => {
+            data.services.split(',').forEach(async (serviceId) => {
                 await this.prisma.scheduleService.create({
                     data: {
                         scheduleId: schedule.id,
@@ -83,7 +79,7 @@ export class ScheduleService {
         await this.isValidPerson(id, personId);
 
         return this.prisma.schedule.delete({
-            where: { id }
+            where: { id },
         });
     }
 

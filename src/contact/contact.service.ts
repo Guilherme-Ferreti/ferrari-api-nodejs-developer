@@ -5,16 +5,16 @@ import { CreateContactDto } from './dto/create-contact.dto';
 
 @Injectable()
 export class ContactService {
-    constructor (private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
     async findOne(id: number) {
         const contact = await this.prisma.contact.findUnique({
             where: {
                 id: isValidNumber(id),
-            }
+            },
         });
 
-        if (! contact) {
+        if (!contact) {
             throw new NotFoundException('Contact not found.');
         }
 
@@ -29,7 +29,7 @@ export class ContactService {
         return this.prisma.contact.findMany({
             where: {
                 personId: isValidNumber(personId),
-            }
+            },
         });
     }
 
@@ -61,7 +61,7 @@ export class ContactService {
                         name: data.name,
                     },
                 });
-            
+
                 personId = +newPerson.id;
             }
         }

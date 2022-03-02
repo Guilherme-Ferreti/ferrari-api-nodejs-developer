@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
@@ -7,260 +7,261 @@ import { createReadStream, existsSync, renameSync, unlinkSync } from 'fs';
 
 @Injectable()
 export class UserService {
-  constructor (private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
-  async get(id: number, removePassword: boolean = true) {
-    id = Number(id);
+    async get(id: number, removePassword: boolean = true) {
+        id = Number(id);
 
-    if (isNaN(id)) {
-      throw new BadRequestException('ID is required!');
+        if (isNaN(id)) {
+            throw new BadRequestException('ID is required!');
+        }
+
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+            include: {
+                Person: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found!');
+        }
+
+        if (removePassword) {
+            delete user.password;
+        }
+
+        return user;
     }
 
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        Person: true,
-      },
-    });
+    async getByEmail(email: string) {
+        if (!email) {
+            throw new BadRequestException('E-mail is required!');
+        }
 
-    if (! user) {
-      throw new NotFoundException('User not found!');
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email,
+            },
+            include: {
+                Person: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found!');
+        }
+
+        delete user.password;
+
+        return user;
     }
 
-    if (removePassword) {
-      delete user.password;
-    }
-
-    return user;
-  }
-
-  async getByEmail(email: string) {
-    if (! email) {
-      throw new BadRequestException('E-mail is required!');
-    }
-
-    const user = await this.prisma.user.findUnique({
-      where: {
+    async create({
+        name,
         email,
-      },
-      include: {
-        Person: true,
-      },
-    });
+        birthAt,
+        phone,
+        document,
+        password,
+    }: {
+        name: string;
+        email: string;
+        password: string;
+        birthAt?: Date;
+        phone?: string;
+        document?: string;
+    }) {
+        if (!name) {
+            throw new BadRequestException('Name is required!');
+        }
 
-    if (! user) {
-      throw new NotFoundException('User not found!');
+        if (!email) {
+            throw new BadRequestException('E-mail is required!');
+        }
+
+        if (!password) {
+            throw new BadRequestException('Password is required!');
+        }
+
+        if (birthAt && birthAt.toString().toLowerCase() == 'invalid date') {
+            throw new BadRequestException('BirthAt is invalid!');
+        }
+
+        let user = null;
+
+        try {
+            user = await this.getByEmail(email);
+        } catch (e) {}
+
+        if (user) {
+            throw new BadRequestException('E-mail already exists!');
+        }
+
+        const createdUser = await this.prisma.user.create({
+            data: {
+                Person: {
+                    create: {
+                        name,
+                        birthAt,
+                        document,
+                        phone,
+                    },
+                },
+                email,
+                password: bcrypt.hashSync(password, 10),
+            },
+            include: {
+                Person: true,
+            },
+        });
+
+        delete createdUser.password;
+
+        return createdUser;
     }
 
-    delete user.password;
-
-    return user;
-  }
-
-  async create({ 
-    name,
-    email,
-    birthAt,
-    phone,
-    document,
-    password,
-  }:{
-    name: string;
-    email: string;
-    password: string,
-    birthAt?: Date;
-    phone?: string;
-    document?: string;
-  }) {
-    if (! name) {
-      throw new BadRequestException('Name is required!');
-    }
-
-    if (! email) {
-      throw new BadRequestException('E-mail is required!');
-    }
-
-    if (! password) {
-      throw new BadRequestException('Password is required!');
-    }
-
-    if (birthAt && birthAt.toString().toLowerCase() == 'invalid date') {
-      throw new BadRequestException('BirthAt is invalid!');
-    }
-
-    let user = null;
-
-    try {
-      user = await this.getByEmail(email);
-    } catch (e) {
-      
-    }
-
-    if (user) {
-      throw new BadRequestException('E-mail already exists!');
-    }
-
-    const createdUser = await this.prisma.user.create({
-      data: {
-        Person: {
-          create: {
+    async update(
+        id: number,
+        {
             name,
+            email,
             birthAt,
-            document,
             phone,
-          },
+            document,
+            photo,
+        }: {
+            name?: string;
+            email?: string;
+            birthAt?: Date;
+            phone?: string;
+            document?: string;
+            photo?: string;
         },
-        email,
-        password: bcrypt.hashSync(password, 10),
-      },
-      include: {
-        Person: true,
-      },
-    });
+    ) {
+        id = Number(id);
 
-    delete createdUser.password;
+        if (isNaN(id)) {
+            throw new BadRequestException('ID is not a number!');
+        }
 
-    return createdUser;
-  }
+        const personData = {} as Prisma.PersonUpdateInput;
+        const userData = {} as Prisma.UserUpdateInput;
 
-  async update(id: number, { 
-    name,
-    email,
-    birthAt,
-    phone,
-    document,
-    photo,
-  }:{
-    name?: string;
-    email?: string;
-    birthAt?: Date;
-    phone?: string;
-    document?: string;
-    photo?: string;
-  }) {
-    id = Number(id);
+        if (name) {
+            personData.name = name;
+        }
 
-    if (isNaN(id)) {
-      throw new BadRequestException('ID is not a number!');
+        if (birthAt) {
+            personData.birthAt = birthAt;
+        }
+
+        if (phone) {
+            personData.phone = phone;
+        }
+
+        if (document) {
+            personData.document = document;
+        }
+
+        if (photo) {
+            userData.photo = photo;
+        }
+
+        if (email) {
+            userData.email = email;
+        }
+
+        const user = await this.get(id);
+
+        if (personData) {
+            await this.prisma.person.update({
+                where: {
+                    id: user.personId,
+                },
+                data: personData,
+            });
+        }
+
+        if (userData) {
+            await this.prisma.user.update({
+                where: {
+                    id,
+                },
+                data: userData,
+            });
+        }
+
+        return this.get(id);
     }
 
-    const personData = {} as Prisma.PersonUpdateInput;
-    const userData = {} as Prisma.UserUpdateInput;
+    async setPhoto(id: number, photo: Express.Multer.File) {
+        if (!['image/jpg', 'image/jpeg', 'image/png'].includes(photo.mimetype)) {
+            throw new BadRequestException('Invalid file type.');
+        }
 
-    if (name) {
-      personData.name = name;
-    }
-    
-    if (birthAt) {
-      personData.birthAt = birthAt;
-    }
-    
-    if (phone) {
-      personData.phone = phone;
-    }
+        await this.removePhoto(id);
 
-    if (document) {
-      personData.document = document;
-    }
-    
-    if (photo) {
-      userData.photo = photo;
-    }
+        let ext = '';
 
-    if (email) {
-      userData.email = email;
-    }
+        switch (photo.mimetype) {
+            case 'image/png':
+                ext = 'png';
+                break;
 
-    const user = await this.get(id);
+            default:
+                ext = 'jpg';
+        }
 
-    if (personData) {
-      await this.prisma.person.update({
-        where: {
-          id: user.personId,
-        },
-        data: personData
-      });
+        const photoName = `${photo.filename}.${ext}`;
+        const from = this.getPhotoStoragePath(photo.filename);
+        const to = this.getPhotoStoragePath(photoName);
+
+        renameSync(from, to);
+
+        return this.update(id, {
+            photo: photoName,
+        });
     }
 
-    if (userData) {
-      await this.prisma.user.update({
-        where: {
-          id,
-        },
-        data: userData
-      });
+    async getPhoto(id: number) {
+        const { photo } = await this.get(id);
+
+        let filePath = this.getPhotoStoragePath('../nophoto.png');
+
+        if (photo) {
+            filePath = this.getPhotoStoragePath(photo);
+        }
+
+        const file = createReadStream(this.getPhotoStoragePath(photo));
+
+        const extension = filePath.split('.').pop();
+
+        return {
+            file,
+            extension,
+        };
     }
 
-    return this.get(id);
-  }
+    async removePhoto(userId: number) {
+        const { photo } = await this.get(userId);
 
-  async setPhoto(id: number, photo: Express.Multer.File) {
-    if (! ['image/jpg', 'image/jpeg', 'image/png'].includes(photo.mimetype)) {
-      throw new BadRequestException('Invalid file type.');
+        if (photo) {
+            const currentPhoto = this.getPhotoStoragePath(photo);
+
+            if (existsSync(currentPhoto)) {
+                unlinkSync(currentPhoto);
+            }
+        }
+
+        return this.update(userId, {
+            photo: null,
+        });
     }
 
-    await this.removePhoto(id);
-
-    let ext = '';
-
-    switch (photo.mimetype) {
-      case 'image/png': 
-        ext = 'png';
-        break;
-
-      default:
-        ext = 'jpg';
+    getPhotoStoragePath(photoName: string): string {
+        return join(__dirname, '../', '../', '../', 'storage', 'photos', photoName);
     }
-
-    const photoName = `${photo.filename}.${ext}`;
-    const from = this.getPhotoStoragePath(photo.filename);
-    const to = this.getPhotoStoragePath(photoName);
-
-    renameSync(from, to);
-
-    return this.update(id, {
-      photo: photoName,
-    });
-  }
-
-  async getPhoto(id: number) {
-    const { photo } = await this.get(id);
-
-    let filePath = this.getPhotoStoragePath('../nophoto.png');
-
-    if (photo) {
-      filePath = this.getPhotoStoragePath(photo);
-    }
-
-    const file = createReadStream(this.getPhotoStoragePath(photo));
-
-    const extension = filePath.split('.').pop();
-
-    return {
-      file,
-      extension,
-    }
-  }
-
-  async removePhoto(userId: number) {
-    const { photo } = await this.get(userId);
-
-    if (photo) {
-      const currentPhoto = this.getPhotoStoragePath(photo);
-
-      if (existsSync(currentPhoto)) {
-        unlinkSync(currentPhoto);
-      }
-    }
-
-    return this.update(userId, {
-      photo: null,
-    });
-  }
-
-  getPhotoStoragePath(photoName: string): string {
-    return join(__dirname, '../', '../', '../', 'storage', 'photos', photoName);
-  }
 }

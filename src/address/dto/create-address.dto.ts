@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength } from "class-validator";
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateAddressDto {
     @IsNotEmpty({ message: 'The street is required.' })
