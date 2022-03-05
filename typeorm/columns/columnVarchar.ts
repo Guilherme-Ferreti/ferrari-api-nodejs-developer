@@ -1,4 +1,4 @@
-import { TableColumnOptions } from "typeorm";
+import { TableColumnOptions } from 'typeorm';
 
 export function columnVarchar(name: string = 'name', length: string = '255', isNullable: boolean = false) {
     return {

@@ -1,4 +1,4 @@
-import { TableColumnOptions } from "typeorm";
+import { TableColumnOptions } from 'typeorm';
 
 export const columnUpdatedAt = {
     name: 'updatedAt',

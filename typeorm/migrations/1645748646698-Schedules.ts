@@ -1,80 +1,93 @@
-import {MigrationInterface, QueryRunner, Table, TableForeignKey} from "typeorm";
-import { columnCreatedAt, columnId, columnUpdatedAt } from "../columns";
+import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
+import { columnCreatedAt, columnId, columnUpdatedAt } from '../columns';
 
 export class Schedules1645748646698 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.createTable(new Table({
-            name: 'schedules',
-            columns: [
-                columnId,
-                {
-                    name: 'personId',
-                    type: 'int',
-                },
-                {
-                    name: 'timeOptionId',
-                    type: 'int',
-                },
-                {
-                    name: 'paymentSituationId',
-                    type: 'int',
-                },
-                {
-                    name: 'billingAddressId',
-                    type: 'int',
-                },
-                {
-                    name: 'scheduleAt',
-                    type: 'date',
-                },
-                {
-                    name: 'total',
-                    type: 'decimal',
-                    precision: 10,
-                    scale: 2,
-                },
-                {
-                    name: 'installments',
-                    type: 'tinyint',
-                    default: 1,
-                },
-                columnCreatedAt,
-                columnUpdatedAt,
-            ],
-        }));
+        await queryRunner.createTable(
+            new Table({
+                name: 'schedules',
+                columns: [
+                    columnId,
+                    {
+                        name: 'personId',
+                        type: 'int',
+                    },
+                    {
+                        name: 'timeOptionId',
+                        type: 'int',
+                    },
+                    {
+                        name: 'paymentSituationId',
+                        type: 'int',
+                    },
+                    {
+                        name: 'billingAddressId',
+                        type: 'int',
+                    },
+                    {
+                        name: 'scheduleAt',
+                        type: 'date',
+                    },
+                    {
+                        name: 'total',
+                        type: 'decimal',
+                        precision: 10,
+                        scale: 2,
+                    },
+                    {
+                        name: 'installments',
+                        type: 'tinyint',
+                        default: 1,
+                    },
+                    columnCreatedAt,
+                    columnUpdatedAt,
+                ],
+            }),
+        );
 
-        await queryRunner.createForeignKey('schedules', new TableForeignKey({
-            columnNames: ['personId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'persons',
-            name: 'FK_schedules_persons',
-            onDelete: 'CASCADE',
-        }));
+        await queryRunner.createForeignKey(
+            'schedules',
+            new TableForeignKey({
+                columnNames: ['personId'],
+                referencedColumnNames: ['id'],
+                referencedTableName: 'persons',
+                name: 'FK_schedules_persons',
+                onDelete: 'CASCADE',
+            }),
+        );
 
-        await queryRunner.createForeignKey('schedules', new TableForeignKey({
-            columnNames: ['timeOptionId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'time_options',
-            name: 'FK_schedules_time_options',
-            onDelete: 'CASCADE',
-        }));
+        await queryRunner.createForeignKey(
+            'schedules',
+            new TableForeignKey({
+                columnNames: ['timeOptionId'],
+                referencedColumnNames: ['id'],
+                referencedTableName: 'time_options',
+                name: 'FK_schedules_time_options',
+                onDelete: 'CASCADE',
+            }),
+        );
 
-        await queryRunner.createForeignKey('schedules', new TableForeignKey({
-            columnNames: ['paymentSituationId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'payment_situations',
-            name: 'FK_schedules_payment_situations',
-            onDelete: 'CASCADE',
-        }));
+        await queryRunner.createForeignKey(
+            'schedules',
+            new TableForeignKey({
+                columnNames: ['paymentSituationId'],
+                referencedColumnNames: ['id'],
+                referencedTableName: 'payment_situations',
+                name: 'FK_schedules_payment_situations',
+                onDelete: 'CASCADE',
+            }),
+        );
 
-        await queryRunner.createForeignKey('schedules', new TableForeignKey({
-            columnNames: ['billingAddressId'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'addresses',
-            name: 'FK_schedules_addresses',
-            onDelete: 'CASCADE',
-        }));
+        await queryRunner.createForeignKey(
+            'schedules',
+            new TableForeignKey({
+                columnNames: ['billingAddressId'],
+                referencedColumnNames: ['id'],
+                referencedTableName: 'addresses',
+                name: 'FK_schedules_addresses',
+                onDelete: 'CASCADE',
+            }),
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -85,5 +98,4 @@ export class Schedules1645748646698 implements MigrationInterface {
 
         await queryRunner.dropTable('schedules');
     }
-
 }
